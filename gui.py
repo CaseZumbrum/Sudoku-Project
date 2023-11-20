@@ -1,10 +1,12 @@
 import pygame
-
+from gui_cell import gui_cell
 SIZE = 540
 BG_COLOR = (255,255,255)
 TEXT_COLOR = (0,0,0)
 BORDERSIZE = 6
 CELLSIZE = (SIZE - BORDERSIZE*9)/9
+CELLSIZE = SIZE/9
+
 def draw_game_start(screen):
     # initialize title font
     start_title_font = pygame.font.Font(None,100)
@@ -54,6 +56,7 @@ def draw_game_start(screen):
     screen.blit(med_surface,med_rectangle)
     screen.blit(hard_surface, hard_rectangle)
 
+
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -71,35 +74,85 @@ def draw_game_start(screen):
         pygame.display.flip()
 
 
+def draw_borders(screen):
+    dark_grey = (90,90,90)
+    pygame.draw.rect(screen, dark_grey, (SIZE // 3 - 4 / 2, 0, 4, SIZE))
+    pygame.draw.rect(screen, dark_grey, (SIZE // 3 * 2 - 4 / 2, 0, 4, SIZE))
+    pygame.draw.rect(screen, dark_grey, (0, SIZE // 3 - 4 / 2, SIZE, 4))
+    pygame.draw.rect(screen, dark_grey, (0, SIZE // 3 * 2 - 4 / 2, SIZE, 4))
+
 
 def draw_grid(screen):
-    SIZE2 = (SIZE) // 3
     screen.fill((255, 255, 255))
-    for i in range(0, 3):
-        pygame.draw.rect(screen, (100, 100, 100), (i * SIZE2 + SIZE2 // 3 - BORDERSIZE/2, BORDERSIZE/2, BORDERSIZE, SIZE))
-        pygame.draw.rect(screen, (100, 100, 100), (i * SIZE2 + SIZE2 // 3 * 2 - BORDERSIZE/2, BORDERSIZE/2, BORDERSIZE, SIZE))
-        pygame.draw.rect(screen, (100, 100, 100), (3, i * SIZE2 + SIZE2 // 3 - BORDERSIZE/2, SIZE, BORDERSIZE))
-        pygame.draw.rect(screen, (100, 100, 100), (3, i * SIZE2 + SIZE2 // 3 * 2 - BORDERSIZE/2, SIZE, BORDERSIZE))
+    cells = []
+    for i in range(9):
+        cells.append([])
+        for j in range(9):
+            cells[i].append(gui_cell(i * CELLSIZE, j * CELLSIZE, CELLSIZE, screen, 2))
 
-    pygame.draw.rect(screen, (0, 0, 0), (0, 0, BORDERSIZE/2, SIZE))
-    pygame.draw.rect(screen, (0, 0, 0), (SIZE // 3 - BORDERSIZE/2, 0, BORDERSIZE, SIZE))
-    pygame.draw.rect(screen, (0, 0, 0), (SIZE // 3 * 2 - BORDERSIZE/2, 0, BORDERSIZE, SIZE))
-    pygame.draw.rect(screen, (0, 0, 0), (SIZE - BORDERSIZE/2, 0, BORDERSIZE/2, SIZE))
-
-    pygame.draw.rect(screen, (0, 0, 0), (0, 0, SIZE, BORDERSIZE/2))
-    pygame.draw.rect(screen, (0, 0, 0), (0, SIZE // 3 - BORDERSIZE/2, SIZE, BORDERSIZE))
-    pygame.draw.rect(screen, (0, 0, 0), (0, SIZE // 3 * 2 - BORDERSIZE/2, SIZE, BORDERSIZE))
-    pygame.draw.rect(screen, (0, 0, 0), (0, SIZE - BORDERSIZE/2, SIZE, BORDERSIZE/2))
+    draw_borders(screen)
 
     pygame.display.update()
+
+    pastx = 0
+    pasty = 0
+    user_text = None
+    clicked_xloc = None
+    clicked_yloc = None
+
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
+                '''
+            if event.type == pygame.MOUSEMOTION:
+                xloc = int((event.pos[0]-(event.pos[0]%(CELLSIZE)))/(CELLSIZE))
+                yloc = int((event.pos[1]-(event.pos[1]%(CELLSIZE)))/(CELLSIZE))
+                cells[pastx][pasty].draw_border()
+                cells[xloc][yloc].set_active()
+                pastx = xloc
+                pasty = yloc
+                draw_borders(screen)
+                '''
+
             if event.type == pygame.MOUSEBUTTONDOWN:
-                xloc = (event.pos[0]-(event.pos[0]%(CELLSIZE+BORDERSIZE)))/(CELLSIZE+BORDERSIZE)
-                yloc = (event.pos[1]-(event.pos[1]%(CELLSIZE+BORDERSIZE)))/(CELLSIZE+BORDERSIZE)
-                print(xloc,yloc)
+                clicked_xloc = int((event.pos[0] - (event.pos[0] % (CELLSIZE))) / (CELLSIZE))
+                clicked_yloc = int((event.pos[1] - (event.pos[1] % (CELLSIZE))) / (CELLSIZE))
+                cells[clicked_xloc][clicked_yloc].set_active()
+                cells[pastx][pasty].draw_border()
+                pastx = clicked_xloc
+                pasty = clicked_yloc
+                draw_borders(screen)
+
+                user_text = None
+                print(clicked_xloc, clicked_yloc)
+
+            if event.type == pygame.KEYDOWN:
+
+                # Check for backspace
+                if event.key == pygame.K_BACKSPACE:
+
+                    # get text input from 0 to -1 i.e. end.
+                    user_text = user_text[:-1]
+
+                    # Unicode standard is used for string
+                # formation
+                else:
+                    user_text = event.unicode
+
+            if user_text is not None and clicked_yloc is not None and clicked_xloc is not None and cells[clicked_xloc][clicked_yloc].value == 0:
+
+                text_surface = pygame.font.Font(None,70).render(user_text, True, (50, 50, 50))
+
+                text_rectangle = text_surface.get_rect(
+                    center=(CELLSIZE // 2 + cells[clicked_xloc][clicked_yloc].left, CELLSIZE // 2 + cells[clicked_xloc][clicked_yloc].top)
+                )
+
+                cells[clicked_xloc][clicked_yloc].value = int(user_text)
+
+                screen.blit(text_surface, text_rectangle)
+
+            pygame.display.flip()
 
 
 
