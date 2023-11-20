@@ -23,3 +23,6 @@ class gui_cell(Rect):
         pygame.draw.rect(self.screen, orange, (self.left, self.top, self.dim, 2))
         pygame.draw.rect(self.screen, orange,(self.left + self.dim - self.border_size, self.top, self.border_size, self.dim))
         pygame.draw.rect(self.screen, orange,(self.left, self.top + self.dim - self.border_size, self.dim, self.border_size))
+
+    def clear(self):
+        pygame.draw.rect(self.screen, (240, 240, 240), (self.left + self.border_size,self.top + self.border_size,self.dim - 2*self.border_size, self.dim - 2*self.border_size))
