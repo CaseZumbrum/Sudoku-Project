@@ -74,6 +74,7 @@ def draw_game_start(screen):
         pygame.display.flip()
 
 
+
 def draw_borders(screen):
     dark_grey = (90,90,90)
     pygame.draw.rect(screen, dark_grey, (SIZE // 3 - 4 / 2, 0, 4, SIZE))
@@ -129,12 +130,47 @@ def draw_grid(screen):
 
             if event.type == pygame.KEYDOWN:
 
+                if event.key == pygame.K_UP and clicked_yloc is not None:
+                    clicked_yloc -= 1
+                    cells[clicked_xloc][clicked_yloc].set_active()
+                    cells[pastx][pasty].draw_border()
+                    pastx = clicked_xloc
+                    pasty = clicked_yloc
+                    draw_borders(screen)
+
+                    user_text = None
+                elif event.key == pygame.K_DOWN and clicked_yloc is not None:
+                    clicked_yloc += 1
+                    cells[clicked_xloc][clicked_yloc].set_active()
+                    cells[pastx][pasty].draw_border()
+                    pastx = clicked_xloc
+                    pasty = clicked_yloc
+                    draw_borders(screen)
+
+                    user_text = None
+                elif event.key == pygame.K_LEFT and clicked_xloc is not None:
+                    clicked_xloc -= 1
+                    cells[clicked_xloc][clicked_yloc].set_active()
+                    cells[pastx][pasty].draw_border()
+                    pastx = clicked_xloc
+                    pasty = clicked_yloc
+                    draw_borders(screen)
+
+                    user_text = None
+                elif event.key == pygame.K_RIGHT and clicked_xloc is not None:
+                    clicked_xloc += 1
+                    cells[clicked_xloc][clicked_yloc].set_active()
+                    cells[pastx][pasty].draw_border()
+                    pastx = clicked_xloc
+                    pasty = clicked_yloc
+                    draw_borders(screen)
+
+                    user_text = None
                 # Check for backspace
-                if event.key == pygame.K_BACKSPACE:
+                elif event.key == pygame.K_BACKSPACE:
 
                     # get text input from 0 to -1 i.e. end.
                     user_text = user_text[:-1]
-
                     # Unicode standard is used for string
                 # formation
                 else:
