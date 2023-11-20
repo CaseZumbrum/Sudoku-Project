@@ -176,7 +176,9 @@ def draw_grid(screen):
                 else:
                     user_text = event.unicode
 
-            if user_text is not None and clicked_yloc is not None and clicked_xloc is not None and cells[clicked_xloc][clicked_yloc].value == 0:
+            if user_text is not None and clicked_yloc is not None and clicked_xloc is not None:
+
+                cells[clicked_xloc][clicked_yloc].clear()
 
                 text_surface = pygame.font.Font(None,70).render(user_text, True, (50, 50, 50))
 
