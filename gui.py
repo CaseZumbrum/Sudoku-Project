@@ -1,11 +1,51 @@
 import pygame
 from gui_cell import gui_cell
 
-SIZE = 540 # size of board (should be a multiple of 90
+# Global Variables
+SIZE = 630 # size of board (should be a multiple of 90
 BG_COLOR = (255,255,255) # background color
 TEXT_COLOR = (0,0,0) # default text color
 BORDERSIZE = 4 # size of the borders
 CELLSIZE = SIZE/9 # dimension of single cell
+
+
+'''
+test function REMOVE LATER
+'''
+def generate_board(difficulty):
+    if difficulty == "easy":
+        board = [[1,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],
+                 [0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],
+                 [0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0]]
+    elif difficulty == "medium":
+        board = [[2,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],
+                 [0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],
+                 [0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0],[0,0,0,0,0,0,0,0,0]]
+    elif difficulty == "hard":
+        board = [[3, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0],
+                [0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0],
+                 [0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0], [0, 0, 0, 0, 0, 0, 0, 0, 0]]
+    return board
+
+'''
+fills gui board with sudoku data
+'''
+def fill_gui_board(screen,cells,difficulty):
+    board = generate_board(difficulty)
+    # add entered number to the active cell
+    for i in range(9):
+        for j in range(9):
+            if board[i][j] != 0:
+                text_surface = pygame.font.Font(None, 70).render(str(board[i][j]), True, (50, 50, 50))
+                text_rectangle = text_surface.get_rect(
+                    center=(
+                    CELLSIZE // 2 + cells[i][j].left, CELLSIZE // 2 + cells[i][j].top)
+                )
+                screen.blit(text_surface, text_rectangle)
+
+                # set the value of the active cell to the entered number
+                cells[i][j].value = board[i][j]
+                cells[i][j].set = True
 
 '''
 draw_game_start loads the start page for sudoku
@@ -69,13 +109,13 @@ def draw_game_start(screen):
             if event.type == pygame.MOUSEBUTTONDOWN:
                 if easy_rectangle.collidepoint(event.pos):
                     print("Easy")
-                    sudoku_game(screen)
+                    sudoku_game(screen,"easy")
                 elif med_rectangle.collidepoint(event.pos):
                     print("Medium")
-                    sudoku_game(screen)
+                    sudoku_game(screen,"medium")
                 elif hard_rectangle.collidepoint(event.pos):
                     print("Hard")
-                    sudoku_game(screen)
+                    sudoku_game(screen,"hard")
 
         pygame.display.flip()
 
@@ -100,7 +140,7 @@ sudoku_game draws the sudoku grid and allows for user input
 Parameters:
     screen: a pygame surface that the sudoku board is on
 '''
-def sudoku_game(screen):
+def sudoku_game(screen,difficulty):
     # reset screen
     screen.fill((255, 255, 255))
 
@@ -113,7 +153,7 @@ def sudoku_game(screen):
 
     # draw the borders of the game
     draw_borders(screen)
-
+    fill_gui_board(screen,cells,difficulty)
     pygame.display.update()
 
     # initialize variables
@@ -194,7 +234,7 @@ def sudoku_game(screen):
                     user_text = event.unicode
 
             # if a number has been entered and there is a currently active cell
-            if user_text is not None and clicked_yloc is not None and clicked_xloc is not None:
+            if user_text is not None and clicked_yloc is not None and clicked_xloc is not None and not cells[clicked_xloc][clicked_yloc].set:
                 # erase whatever is in the cell
                 cells[clicked_xloc][clicked_yloc].clear()
 

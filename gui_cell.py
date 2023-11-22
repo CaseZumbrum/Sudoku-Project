@@ -25,6 +25,7 @@ class gui_cell(Rect):
         self.value = 0
         pygame.draw.rect(self.screen, (240,240,240),self)
         self.draw_border()
+        self.set = set
 
     '''
     draw_border draws the border of the cell (occurs within the bounds of the cell)
