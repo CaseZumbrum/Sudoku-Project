@@ -1,12 +1,13 @@
 from pygame import Rect
 import pygame
 
+
 '''
 gui_cell extends pygame.Rect and represents a single cell of a sudoku board
 
 upon creation, the cell is drawn on the board
 '''
-class gui_cell(Rect):
+class Cell(Rect):
     '''
     Attributes:
         left (Int): distance from the left side of the screen
@@ -17,12 +18,12 @@ class gui_cell(Rect):
         set (Bool: if the cell can be changed
         value (Int): the number stored in the cell
     '''
-    def __init__(self,left,top,dim,screen,border_size, set = False):
+    def __init__(self,left,top,dim,screen,border_size, set = False,value = 0):
         super().__init__(left, top, dim, dim)
         self.dim = dim
         self.screen = screen
         self.border_size = border_size
-        self.value = 0
+        self.value = value
         pygame.draw.rect(self.screen, (240,240,240),self)
         self.draw_border()
         self.set = set
@@ -52,3 +53,19 @@ class gui_cell(Rect):
     '''
     def clear(self):
         pygame.draw.rect(self.screen, (240, 240, 240), (self.left + self.border_size,self.top + self.border_size,self.dim - 2*self.border_size, self.dim - 2*self.border_size))
+
+    def update(self,user_text):
+        # erase whatever is in the cell
+        self.clear()
+
+        # add entered number to the active cell
+        text_surface = pygame.font.Font(None, 70).render(user_text, True, (50, 50, 50))
+        text_rectangle = text_surface.get_rect(
+            center=(self.dim // 2 + self.left,
+                    self.dim // 2 + self.top)
+        )
+        self.screen.blit(text_surface, text_rectangle)
+
+        # set the value of the active cell to the entered number
+        self.value = int(user_text)
+        print(self.value)
