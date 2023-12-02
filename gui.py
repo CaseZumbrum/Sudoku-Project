@@ -1,6 +1,6 @@
 import pygame
-from gui_cell import gui_cell
-
+from cell import Cell
+import sudoku_generator
 # Global Variables
 SIZE = 630 # size of board (should be a multiple of 90
 BG_COLOR = (255,255,255) # background color
@@ -32,7 +32,7 @@ fills gui board with sudoku board data
 
 Parameters:
     screen (pygame.Surface): screen the gameboard is on
-    cells ([gui_cell]): list of all cells on the board
+    cells ([Cell]): list of all cells on the board
     difficulty (String): difficulty of the game
 '''
 def fill_gui_board(screen,cells,difficulty):
@@ -163,13 +163,12 @@ Parameters:
 def sudoku_game(screen,difficulty):
     # reset screen
     screen.fill((255, 255, 255))
-
     # define list of cells and add to the board
     cells = []
     for i in range(9):
         cells.append([])
         for j in range(9):
-            cells[i].append(gui_cell(i * CELLSIZE, j * CELLSIZE, CELLSIZE, screen, BORDERSIZE/2))
+            cells[i].append(Cell(i * CELLSIZE, j * CELLSIZE, CELLSIZE, screen, BORDERSIZE/2))
 
     # draw the borders of the game
     draw_borders(screen)
@@ -210,8 +209,8 @@ def sudoku_game(screen,difficulty):
     pastx = 0
     pasty = 0
     user_text = None
-    clicked_xloc = None
-    clicked_yloc = None
+    x = None
+    y = None
 
     while True:
         for event in pygame.event.get():
@@ -234,15 +233,15 @@ def sudoku_game(screen,difficulty):
                     return
                 elif pygame.Rect(0,0,SIZE,SIZE).collidepoint(event.pos):
                     # get the location where the user clicked
-                    clicked_xloc = int((event.pos[0] - (event.pos[0] % (CELLSIZE))) / (CELLSIZE))
-                    clicked_yloc = int((event.pos[1] - (event.pos[1] % (CELLSIZE))) / (CELLSIZE))
+                    x = int((event.pos[0] - (event.pos[0] % (CELLSIZE))) / (CELLSIZE))
+                    y = int((event.pos[1] - (event.pos[1] % (CELLSIZE))) / (CELLSIZE))
 
                     # activate current cell
-                    cells[clicked_xloc][clicked_yloc].set_active()
+                    cells[x][y].set_active()
                     # un-activate last chosen cell
                     cells[pastx][pasty].draw_border()
-                    pastx = clicked_xloc
-                    pasty = clicked_yloc
+                    pastx = x
+                    pasty = y
                     # redraw borders (in case the activated cell was on a border
                     draw_borders(screen)
 
@@ -252,39 +251,39 @@ def sudoku_game(screen,difficulty):
             if event.type == pygame.KEYDOWN:
 
                 # arrow keys
-                if event.key == pygame.K_UP and clicked_yloc is not None:
-                    clicked_yloc -= 1
-                    cells[clicked_xloc][clicked_yloc].set_active()
+                if event.key == pygame.K_UP and y is not None:
+                    y -= 1
+                    cells[x][y].set_active()
                     cells[pastx][pasty].draw_border()
-                    pastx = clicked_xloc
-                    pasty = clicked_yloc
+                    pastx = x
+                    pasty = y
                     draw_borders(screen)
 
                     user_text = None
-                elif event.key == pygame.K_DOWN and clicked_yloc is not None:
-                    clicked_yloc += 1
-                    cells[clicked_xloc][clicked_yloc].set_active()
+                elif event.key == pygame.K_DOWN and y is not None:
+                    y += 1
+                    cells[x][y].set_active()
                     cells[pastx][pasty].draw_border()
-                    pastx = clicked_xloc
-                    pasty = clicked_yloc
+                    pastx = x
+                    pasty = y
                     draw_borders(screen)
 
                     user_text = None
-                elif event.key == pygame.K_LEFT and clicked_xloc is not None:
-                    clicked_xloc -= 1
-                    cells[clicked_xloc][clicked_yloc].set_active()
+                elif event.key == pygame.K_LEFT and x is not None:
+                    x -= 1
+                    cells[x][y].set_active()
                     cells[pastx][pasty].draw_border()
-                    pastx = clicked_xloc
-                    pasty = clicked_yloc
+                    pastx = x
+                    pasty = y
                     draw_borders(screen)
 
                     user_text = None
-                elif event.key == pygame.K_RIGHT and clicked_xloc is not None:
-                    clicked_xloc += 1
-                    cells[clicked_xloc][clicked_yloc].set_active()
+                elif event.key == pygame.K_RIGHT and x is not None:
+                    x += 1
+                    cells[x][y].set_active()
                     cells[pastx][pasty].draw_border()
-                    pastx = clicked_xloc
-                    pasty = clicked_yloc
+                    pastx = x
+                    pasty = y
                     draw_borders(screen)
 
                     user_text = None
@@ -293,25 +292,15 @@ def sudoku_game(screen,difficulty):
                 elif event.key == pygame.K_1 or event.key == pygame.K_2 or event.key == pygame.K_3 or event.key == pygame.K_4 or event.key == pygame.K_5 or event.key == pygame.K_6 or event.key == pygame.K_7 or event.key == pygame.K_8 or event.key == pygame.K_9:
                     user_text = event.unicode
 
-            # if a number has been entered and there is a currently active cell
-            if user_text is not None and clicked_yloc is not None and clicked_xloc is not None and not cells[clicked_xloc][clicked_yloc].set:
-                # erase whatever is in the cell
-                cells[clicked_xloc][clicked_yloc].clear()
-
-                # add entered number to the active cell
-                text_surface = pygame.font.Font(None,70).render(user_text, True, (50, 50, 50))
-                text_rectangle = text_surface.get_rect(
-                    center=(CELLSIZE // 2 + cells[clicked_xloc][clicked_yloc].left, CELLSIZE // 2 + cells[clicked_xloc][clicked_yloc].top)
-                )
-                screen.blit(text_surface, text_rectangle)
-
-                # set the value of the active cell to the entered number
-                cells[clicked_xloc][clicked_yloc].value = int(user_text)
-                user_text = None
+                # if a number has been entered and there is a currently active cell
+                if user_text is not None and y is not None and x is not None and not cells[x][y].set:
+                    cells[x][y].update(user_text)
+                    user_text = None
 
 
             # update display
             pygame.display.flip()
+
 
 
 
