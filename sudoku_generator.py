@@ -27,7 +27,7 @@ class SudokuGenerator:
     def __init__(self, row_length, removed_cells):
         self.row_length = row_length
         self.removed_cells = removed_cells
-        self.board = [[0] * row_length] * row_length
+        self.board = [[0] * row_length for i in range(9)]
         self.box_length = int(math.sqrt(row_length))
 
     '''
@@ -81,7 +81,7 @@ class SudokuGenerator:
 	Return: boolean
     '''
 
-    def valid_in_col(self, col=0, num=9):
+    def valid_in_col(self, col, num):
         column = []
         for row in self.board:
             column.append(row[col])
@@ -107,7 +107,6 @@ class SudokuGenerator:
         for i in range(col_start, col_start + self.box_length):
             row = self.board[i][row_start:row_start + self.box_length]
             box.append(row)
-        print(box)
         for i in range(self.box_length):
             if num in box[i]:
                 return False
@@ -145,7 +144,18 @@ class SudokuGenerator:
     '''
 
     def fill_box(self, row_start, col_start):
-        pass
+        numinbox = {None}
+        for rowindex in range(row_start, row_start + 3):
+            for colindex in range(col_start, col_start + 3):
+                while self.board[rowindex][colindex] == 0:
+                    newnum = random.randint(1, 9)
+                    if newnum in numinbox:
+                        continue
+                    else:
+                        self.board[rowindex][colindex] = newnum
+                        numinbox.add(newnum)
+                        break
+        return None
 
     '''
     Fills the three boxes along the main diagonal of the board
@@ -156,7 +166,9 @@ class SudokuGenerator:
     '''
 
     def fill_diagonal(self):
-        pass
+        for i in range(0, self.row_length, self.box_length):
+            self.fill_box(i, i)
+        return None
 
     '''
     DO NOT CHANGE
@@ -211,6 +223,7 @@ class SudokuGenerator:
         self.fill_diagonal()
         self.fill_remaining(0, self.box_length)
 
+
     '''
     Removes the appropriate number of cells from the board
     This is done by setting some values to 0
@@ -245,10 +258,14 @@ Return: list[list] (a 2D Python list to represent the board)
 '''
 
 
-def generate_sudoku(size, removed):
+def generate_sudoku(size=9, removed=0):
     sudoku = SudokuGenerator(size, removed)
     sudoku.fill_values()
     board = sudoku.get_board()
     sudoku.remove_cells()
     board = sudoku.get_board()
     return board
+
+sudoku = SudokuGenerator(9, 0)
+sudoku.fill_values()
+sudoku.print_board()
