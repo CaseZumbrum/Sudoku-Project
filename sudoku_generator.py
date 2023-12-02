@@ -104,8 +104,8 @@ class SudokuGenerator:
 
     def valid_in_box(self, row_start, col_start, num):
         box = []
-        for i in range(col_start, col_start + self.box_length):
-            row = self.board[i][row_start:row_start + self.box_length]
+        for i in range(row_start, row_start + self.box_length):
+            row = self.board[i][col_start:col_start + self.box_length]
             box.append(row)
         for i in range(self.box_length):
             if num in box[i]:
@@ -223,7 +223,6 @@ class SudokuGenerator:
         self.fill_diagonal()
         self.fill_remaining(0, self.box_length)
 
-
     '''
     Removes the appropriate number of cells from the board
     This is done by setting some values to 0
@@ -238,7 +237,13 @@ class SudokuGenerator:
     '''
 
     def remove_cells(self):
-        pass
+        coordset = set([])
+        while len(coordset) < self.removed_cells:
+            new_coords = (random.randint(0,8), random.randint(0,8))
+            coordset.add(new_coords)
+        for coord in coordset:
+            self.board[coord[0]][coord[1]] = 0
+        return None
 
 
 '''
@@ -265,7 +270,3 @@ def generate_sudoku(size=9, removed=0):
     sudoku.remove_cells()
     board = sudoku.get_board()
     return board
-
-sudoku = SudokuGenerator(9, 0)
-sudoku.fill_values()
-sudoku.print_board()
