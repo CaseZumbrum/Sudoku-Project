@@ -65,6 +65,7 @@ class Cell(Rect):
         update moves the sketched value to the actual value of the cell
         '''
         if self.sketched is not None:
+            sketched = self.sketched
             # erase whatever is in the cell
             self.clear()
             if self.set:
@@ -72,7 +73,7 @@ class Cell(Rect):
             else:
                 color = (100,100,100)
             # add entered number to the active cell
-            text_surface = pygame.font.Font(None, 70).render(self.sketched, True, color)
+            text_surface = pygame.font.Font(None, 70).render(sketched, True, color)
             text_rectangle = text_surface.get_rect(
                 center=(self.dim // 2 + self.left,
                         self.dim // 2 + self.top)
@@ -80,7 +81,7 @@ class Cell(Rect):
             self.screen.blit(text_surface, text_rectangle)
 
             # set the value of the active cell to the entered number
-            self.value = int(self.sketched)
+            self.value = int(sketched)
 
     def sketch(self,user_text):
         '''
