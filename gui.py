@@ -1,8 +1,6 @@
 import pygame
 from cell import Cell
 import sudoku_generator
-import random
-import time
 # Global Variables
 SIZE = 630  # size of board (should be a multiple of 9)
 BG_COLOR = (255, 255, 255)  # background color
@@ -125,7 +123,7 @@ def generate_board(difficulty):
     :return: 2D array representing sudoku game [[Int]]
     """
     if difficulty == "easy":
-        board = sudoku_generator.generate_sudoku(9, 30)
+        board = sudoku_generator.generate_sudoku(9, 1)
     elif difficulty == "medium":
         board = sudoku_generator.generate_sudoku(9,40)
     elif difficulty == "hard":
@@ -153,24 +151,31 @@ def fill_gui_board(screen, difficulty, board=None):
             if board[i][j] != 0:
                 cells[i].append(Cell(i * CELLSIZE, j * CELLSIZE, CELLSIZE, screen, BORDERSIZE / 2,set=True,sketched=str(board[i][j])))
                 cells[i][j].update()
-            # if the board has a zero in a location, the cell is a defualt cell
+            # if the board has a zero in a location, the cell is a default cell
             else:
                 cells[i].append(Cell(i * CELLSIZE, j * CELLSIZE, CELLSIZE, screen, BORDERSIZE / 2))
     return board,cells
 
 def draw_info_screen(screen):
+    """
+    draw_info_screen draws the game explanation
+    :param screen: pygame screen that is drawn on
+    """
     screen.fill((255,255,255))
     generate_button(screen, "HOW TO PLAY", SIZE // 2, SIZE // 2 - 125, font_size=70)
     generate_button(screen, "1. Click on a cell (or use arrow keys) to select it", SIZE // 2, SIZE // 2 - 50, font_size=30, color=(0,0,0),background_color=(255,255,255))
     generate_button(screen, "2. Type in a number to sketch it to the cell", SIZE // 2, SIZE // 2 - 15, font_size=30, color=(0,0,0),background_color=(255,255,255))
     generate_button(screen, "3. Hit enter to lock in a cell's number", SIZE // 2, SIZE // 2 + 20, font_size=30, color=(0,0,0),background_color=(255,255,255))
     generate_button(screen, "4. Use delete to erase the value of a non-set cell", SIZE // 2, SIZE // 2 + 55, font_size=30, color=(0,0,0),background_color=(255,255,255))
+
     continue_button = generate_button(screen, "CONTINUE", SIZE // 2, SIZE // 2 + 200, font_size=50)
     pygame.display.flip()
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
+
+            # continue button
             elif event.type == pygame.MOUSEBUTTONDOWN:
                 if continue_button.collidepoint(event.pos):
                     draw_game_start(screen)
@@ -306,7 +311,9 @@ def sudoku_game(screen, difficulty):
 
                 # reset button
                 if reset_rectangle.collidepoint(event.pos):
-                    fill_gui_board(screen,cells,difficulty,board)
+                    board,cells = fill_gui_board(screen,difficulty,board)
+                    draw_borders(screen)
+                    pastx, pasty = None, None
                     pygame.display.update()
 
                 # restart button
