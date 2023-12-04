@@ -158,44 +158,35 @@ def fill_gui_board(screen, difficulty, board=None):
                 cells[i].append(Cell(i * CELLSIZE, j * CELLSIZE, CELLSIZE, screen, BORDERSIZE / 2))
     return board,cells
 
-
-def draw_exit_screen(screen):
+def draw_info_screen(screen):
     screen.fill((255,255,255))
-    # create the restart button
-    lose_text = pygame.font.Font(None, 100).render("YOU LOST BITCH", 0, (255, 255, 255))
-    lose_surface = pygame.Surface((lose_text.get_size()[0] + 20, lose_text.get_size()[1] + 20))
-    lose_surface.fill((0, 0, 0))
-    lose_surface.blit(lose_text, (10, 10))
-    lose_rectangle = lose_surface.get_rect(
-        center=(SIZE // 2, SIZE//2)
-    )
-    screen.blit(lose_surface, lose_rectangle)
-
-
-def draw_win_screen(screen):
-    screen.fill((0,0,0))
-    # create the restart button
-    win_text = pygame.font.Font(None, 100).render("YOU WON BITCH", 0, (255, 255, 255))
-    win_surface = pygame.Surface((win_text.get_size()[0] + 20, win_text.get_size()[1] + 20))
-    win_surface.fill((0, 0, 0))
-    win_surface.blit(win_text, (10, 10))
-    win_rectangle = win_surface.get_rect(
-        center=(SIZE // 2, SIZE//2)
-    )
-    screen.blit(win_surface, win_rectangle)
-    pygame.mixer.music.load('yippee.mp3')
-    pygame.mixer.music.play(-1)
+    generate_button(screen, "HOW TO PLAY", SIZE // 2, SIZE // 2 - 125, font_size=70)
+    generate_button(screen, "1. Click on a cell (or use arrow keys) to select it", SIZE // 2, SIZE // 2 - 50, font_size=30, color=(0,0,0),background_color=(255,255,255))
+    generate_button(screen, "2. Type in a number to sketch it to the cell", SIZE // 2, SIZE // 2 - 15, font_size=30, color=(0,0,0),background_color=(255,255,255))
+    generate_button(screen, "3. Hit enter to lock in a cell's number", SIZE // 2, SIZE // 2 + 20, font_size=30, color=(0,0,0),background_color=(255,255,255))
+    generate_button(screen, "4. Use delete to erase the value of a non-set cell", SIZE // 2, SIZE // 2 + 55, font_size=30, color=(0,0,0),background_color=(255,255,255))
+    continue_button = generate_button(screen, "CONTINUE", SIZE // 2, SIZE // 2 + 200, font_size=50)
     pygame.display.flip()
-
     while True:
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
                 pygame.quit()
-        color = (random.randint(0,255),random.randint(0,255),random.randint(0,255))
-        pygame.draw.rect(screen, color, pygame.Rect(random.randint(0,SIZE), random.randint(0,SIZE+100), random.randint(0,SIZE+100), random.randint(0,SIZE+100)))
-        screen.blit(win_surface, win_rectangle)
-        pygame.display.flip()
-        time.sleep(.00001)
+            elif event.type == pygame.MOUSEBUTTONDOWN:
+                if continue_button.collidepoint(event.pos):
+                    draw_game_start(screen)
+                    return
+
+def draw_lose_screen(screen, time):
+    screen.fill((255,255,255))
+
+    generate_button(screen, "YOU LOST", SIZE // 2, SIZE // 2, font_size=100)
+
+def draw_win_screen(screen,time):
+    screen.fill((0,0,0))
+    generate_button(screen, "YOU WIN", SIZE // 2,SIZE // 2, font_size=100)
+    pygame.mixer.music.load('yippee.mp3')
+    pygame.mixer.music.play(-1)
+    pygame.display.flip()
 
 
 def draw_game_start(screen):
@@ -342,20 +333,24 @@ def sudoku_game(screen, difficulty):
 
                 # arrow keys
                 if event.key == pygame.K_UP:
-                    y -= 1
-                    pastx, pasty = activate_cell(screen, cells, x, y, pastx, pasty)
+                    if y != 0:
+                        y -= 1
+                        pastx, pasty = activate_cell(screen, cells, x, y, pastx, pasty)
 
                 elif event.key == pygame.K_DOWN:
-                    y += 1
-                    pastx, pasty = activate_cell(screen, cells, x, y, pastx, pasty)
+                    if y != 8:
+                        y += 1
+                        pastx, pasty = activate_cell(screen, cells, x, y, pastx, pasty)
 
                 elif event.key == pygame.K_LEFT:
-                    x -= 1
-                    pastx, pasty = activate_cell(screen, cells, x, y, pastx, pasty)
+                    if x != 0:
+                        x -= 1
+                        pastx, pasty = activate_cell(screen, cells, x, y, pastx, pasty)
 
                 elif event.key == pygame.K_RIGHT:
-                    x += 1
-                    pastx, pasty = activate_cell(screen, cells, x, y, pastx, pasty)
+                    if x != 8:
+                        x += 1
+                        pastx, pasty = activate_cell(screen, cells, x, y, pastx, pasty)
 
                 # if a number key is hit, sketch the entered value to the active cell
                 elif check_pygame_digit(event.key):
@@ -382,10 +377,10 @@ def sudoku_game(screen, difficulty):
                                 won = False
 
                     if won:
-                        draw_win_screen(screen)
+                        draw_win_screen(screen,str(round(seconds,1)))
                         return
                     else:
-                        draw_exit_screen(screen)
+                        draw_lose_screen(screen,str(round(seconds,1)))
                         return
 
 
@@ -403,4 +398,4 @@ if __name__ == "__main__":
 
     screen = pygame.display.set_mode((SIZE, SIZE+100))
     pygame.display.set_caption("sudoku")
-    draw_game_start(screen)
+    draw_info_screen(screen)

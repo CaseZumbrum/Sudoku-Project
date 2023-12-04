@@ -57,6 +57,7 @@ class Cell(Rect):
         '''
         if not self.set:
             self.value = 0
+            self.sketched = None
             pygame.draw.rect(self.screen, (240, 240, 240), (self.left + self.border_size,self.top + self.border_size,self.dim - 2*self.border_size, self.dim - 2*self.border_size))
 
     def update(self):
