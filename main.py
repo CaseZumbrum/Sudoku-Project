@@ -125,7 +125,7 @@ def generate_board(difficulty):
     :return: 2D array representing sudoku game [[Int]]
     """
     if difficulty == "easy":
-        board = sudoku_generator.generate_sudoku(9, 1)
+        board = sudoku_generator.generate_sudoku(9, 30)
     elif difficulty == "medium":
         board = sudoku_generator.generate_sudoku(9,40)
     elif difficulty == "hard":
@@ -216,7 +216,6 @@ def draw_lose_screen(screen, timer):
         time.sleep(.01)
         pygame.display.flip()
 
-    return_button = generate_button(screen, "Main Menu", 60, SIZE // 2 + 380, font_size=30)
 
 
 def draw_win_screen(screen,timer):
