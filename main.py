@@ -1,6 +1,8 @@
 import pygame
 from cell import Cell
 import sudoku_generator
+import random
+import time
 # Global Variables
 SIZE = 630  # size of board (should be a multiple of 9)
 BG_COLOR = (255, 255, 255)  # background color
@@ -181,14 +183,74 @@ def draw_info_screen(screen):
                     draw_game_start(screen)
                     return
 
-def draw_lose_screen(screen, time):
-    screen.fill((255,255,255))
+def draw_lose_screen(screen, timer):
+    """
+        draws the win screen
+        :param screen: pygame screen that game is on
+        :param timer: time that the user took to win
+        """
 
-    generate_button(screen, "YOU LOST", SIZE // 2, SIZE // 2, font_size=100)
+    screen.fill((0, 0, 0))
+    generate_button(screen, "UH OH", SIZE // 2, SIZE // 2 - 125, font_size=70)
+    generate_button(screen, "YOU LOST!", SIZE // 2, SIZE // 2 + 150, font_size=70)
+    generate_button(screen, "Time: " + timer, SIZE // 2, SIZE // 2 + 225, font_size=70)
+    return_button2 = generate_button(screen, "Main Menu", 60, SIZE // 2 + 380, font_size=30)
 
-def draw_win_screen(screen,time):
+    pygame.display.flip()
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+            if event.type == pygame.MOUSEBUTTONDOWN and return_button2.collidepoint(event.pos):
+                draw_game_start(screen)
+                return
+        # draw the frowny face
+        pygame.draw.circle(screen, (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255)),
+                           (SIZE // 2 - 60, SIZE // 2), 50, 10)
+        pygame.draw.circle(screen, (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255)),
+                           (SIZE // 2 + 60, SIZE // 2), 50, 10)
+        smileyRec = (SIZE // 2 - 28, SIZE // 2 + 50, 50, 50)
+        pygame.draw.arc(screen, (random.randint(0, 255), random.randint(0, 255), random.randint(0, 255)), smileyRec,
+                        0, 3.14, 5)
+
+        time.sleep(.01)
+        pygame.display.flip()
+
+    return_button = generate_button(screen, "Main Menu", 60, SIZE // 2 + 380, font_size=30)
+
+
+def draw_win_screen(screen,timer):
+    """
+    draws the win screen
+    :param screen: pygame screen that game is on
+    :param timer: time that the user took to win
+    """
     screen.fill((0,0,0))
-    generate_button(screen, "YOU WIN", SIZE // 2,SIZE // 2, font_size=100)
+    generate_button(screen, "CONGRATULATIONS", SIZE // 2, SIZE // 2 - 125, font_size=70)
+    generate_button(screen, "YOU WIN!", SIZE // 2, SIZE // 2 + 150, font_size=70)
+    generate_button(screen, "Time: " + timer, SIZE // 2, SIZE // 2 + 225, font_size=70)
+    return_button = generate_button(screen, "Main Menu",60 , SIZE // 2 + 380, font_size=30)
+
+    pygame.display.flip()
+    while True:
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                pygame.quit()
+            if event.type == pygame.MOUSEBUTTONDOWN and return_button.collidepoint(event.pos):
+                draw_game_start(screen)
+                return
+        # draw the smiley face
+        pygame.draw.circle(screen, (random.randint(0,255),random.randint(0,255),random.randint(0,255)),(SIZE//2-60,SIZE//2),50, 10)
+        pygame.draw.circle(screen, (random.randint(0,255),random.randint(0,255),random.randint(0,255)),(SIZE//2+60,SIZE//2),50, 10)
+        smileyRec = (SIZE//2-28 ,SIZE//2 + 50,50,50)
+        pygame.draw.arc(screen, (random.randint(0,255),random.randint(0,255),random.randint(0,255)), smileyRec, 3.14, 0, 5 )
+
+        time.sleep(.01)
+        pygame.display.flip()
+
+
+
+
     pygame.mixer.music.load('yippee.mp3')
     pygame.mixer.music.play(-1)
     pygame.display.flip()
@@ -244,7 +306,7 @@ def draw_game_start(screen):
 def draw_borders(screen):
     '''
     draw_borders draws the thick borders of the sudoku board
-
+    
     :param screen: a pygame surface that the sudoku board is on
     '''
     dark_grey = (90,90,90)
