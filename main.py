@@ -247,11 +247,6 @@ def draw_win_screen(screen,timer):
         time.sleep(.01)
         pygame.display.flip()
 
-
-
-
-    pygame.mixer.music.load('yippee.mp3')
-    pygame.mixer.music.play(-1)
     pygame.display.flip()
 
 
